@@ -1,0 +1,82 @@
+//WEL-GUID {b6ca3568-e1a4-4c9f-9ff9-eea6a9f7b842}
+//------------------------------------------------------------------------------------------------//
+// Description:
+//   AARSYNC MLF Message definition file
+//
+// Design:
+//   * This message file has one generic Fatal, Error, Warning and Info messages. Specific
+//     application message can start from SM010.
+//
+// Revision History:
+//   2024-10-01: Original [Murali Boddeti (or)  mkb]
+//------------------------------------------------------------------------------------------------//
+
+SET AARSYNC
+
+BINDING C
+
+LOCALE ENU OF SET AARSYNC
+
+DEFLOG
+
+MSG  AA001 SEVERITY  FATAL
+    ARG  Message  TYPE STRING
+BEGIN
+    LINE "SM001  F: %<Message>s."
+    DOCUMENTATION
+    #EXPLAIN#
+    Fatal error occured in AARSYNC task. Resolve error and restart application.
+    Contact EMS support personal for more info.
+    #ACTION#
+    None.
+    END_DOC
+END_MSG
+
+MSG  AA002 SEVERITY  ERROR
+    ARG  Message  TYPE STRING
+BEGIN
+    LINE "SM002  E: %<Message>s."
+    DOCUMENTATION
+    #EXPLAIN#
+    AARSYNC task issues error  message.
+    #ACTION#
+    Error occured during AARSYNC task processing. Resolve the error or contact
+    EMS support personal for more info.
+    END_DOC
+END_MSG
+
+MSG  AA003 SEVERITY  WARNING
+    ARG  Message  TYPE STRING
+BEGIN
+    LINE "SM003  W: %<Message>s."
+    DOCUMENTATION
+    #EXPLAIN#
+    AARSYNC task issues warning  message.
+    #ACTION#
+    Take appropriate action as per the message or contact EMS support personal 
+    END_DOC
+END_MSG
+
+MSG  AA004 SEVERITY  INFO
+    ARG  Message  TYPE STRING
+BEGIN
+    LINE "SM004  I: %<Message>s"
+    DOCUMENTATION
+    #EXPLAIN#
+    Program determined information message.
+    #ACTION#
+    No action necessary.
+    END_DOC
+END_MSG  
+
+MSG  AA005 SEVERITY  INFO
+    ARG  Message  TYPE STRING
+BEGIN
+    LINE "SM005  D: %<Message>s"
+    DOCUMENTATION
+    #EXPLAIN#
+    Program determined debug message.
+    #ACTION#
+    No action necessary.
+    END_DOC
+END_MSG  

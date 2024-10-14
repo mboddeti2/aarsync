@@ -1,0 +1,134 @@
+!------------------------------------------------------------------------------------------------//
+! Description:
+!   Dbdef file definining all AARSYNC database, partitions, records and field details
+!
+! Revision History:
+!   2024-10-01: Original [Murali Boddeti (or)  mkb]
+!------------------------------------------------------------------------------------------------//
+
+//DBDEF AARSDB TITLE=(PSE_AARSYNC)
+
+//RECTYP AARELE(5000) NOPARENT
+// FLAGS = (GLOBAL,OID)
+Ambient Adjusted Rating Element (Can associate to NETMOM.LN or NETMOM.ZBR or NETMOM.XF)
+
+//RECTYP AAROUT(10000) NOPARENT
+// FLAGS = (GLOBAL,OID)
+Holds auto populated Current Hour MVA points as read by AARSync from SCADAMOM.SCADA.EMS
+
+!------------------------------------------------------------------------------------------------//
+!-- Partition AARSPR Details --------------------------------------------------------------------//
+!------------------------------------------------------------------------------------------------//
+//FLDPAR AARSPR
+// FLAGS=(REPLICATED)
+AARSync Application Parameter Replicated Partition
+
+!-- ITEMS Record AARSPR Partition Details -------------------------------------------------------//
+//FIELD DNVFILE C*64 FILL=80
+DNV File name including Path (Can contain environment variables)
+
+//FIELD FLOLDTH I*4 FILL=80
+FILEOLD flag is set to true after this many seconds of DNV file not updating. (Default 2 Hours or 2*60*60 seconds)
+
+//FIELD PERTM I*4 FILL=80
+Periodic timer1 in seconds to check file updates (default = 5*60)
+
+//FIELD OFFTM I*4 FILL=80
+Timer1 offset in seconds (default = 0)
+
+//FIELD DBGLVL I*4 FILL=80
+Debug Manager Message Level (default = 0)
+
+//FIELD DBGFUN I*4 FILL=80
+Debug Manager Function number (default = 0)
+
+//FIELD MAXMSG I*4 FILL=80
+Debug Manager Max number of message (default = 100,000)
+
+//FIELD QPR B*4 FILL=00
+Bit Container to hold various flags that are parameters and replicated
+//MASK STDOUT
+True when debug messages are disposed to STDOUT
+
+!------------------------------------------------------------------------------------------------//
+!-- Partition AARSMR Details --------------------------------------------------------------------//
+!------------------------------------------------------------------------------------------------//
+//FLDPAR AARSMR
+// FLAGS=(REPLICATED)
+AARSync Application Monitored Replicated Partition
+
+!-- ITEMS Record AARSMR Partition Details -------------------------------------------------------//
+//FIELD FILEMT T*4 FILL=80
+Last DNV file modified time as seen by AARSync
+
+//FIELD TVALNMD T*4 FILL=80
+NETMOM Validation time as seen by AARSync
+
+//FIELD SCADART T*4 FILL=80
+Last SCADAMOM read time as seen by AARSync
+
+//FIELD QR B*4 FILL=00
+Bit Container to hold various flags that are monitored and replicated
+//MASK FILEOLD
+True when file is older than the threshold
+//MASK FILEERR
+True when file reading error occurred
+
+!-- AARELE Record AARSMR Partition Details ------------------------------------------------------//
+//FIELD ID_AARELE C*14 FILL=80
+AARELE Id matching with NETMOM.ID_LINE or NETMOM.ID_XF or NETMOM.ID_CB
+
+//FIELD SEGID_AARELE C*4 FILL=80
+Segment ID matching with NETMOM.ID_LN or NETMOM.ID_XFMR or NETMOM.ID_CBTYP
+
+//FIELD QR_AARELE B*4 FILL=00
+Bit Container to hold flags that are monitored and replicated
+//MASK LN
+True when this AARELE is a Line
+//MASK ZB
+True when this AARELE is a ZBR
+//MASK XF
+True when this AARELE is a Transformer
+//MASK NMAP
+True when this AARELE is mapped to NETMOM
+//MASK SMAP
+True when this AARELE is mapped to SCADAMOM
+//MASK MAN
+True when Current Hour AAR ratings are manually overwritten
+
+//FIELD FRST_AARELE C*8 FILL=00
+Element From Station read from NETMOM.RTNET.EMS
+
+//FIELD TOST_AARELE C*8 FILL=00
+Element To Station read from NETMOM.RTNET.EMS
+
+//FIELD RTG1_AARELE R*4 FILL=00
+Current Hour Normal Rating
+
+//FIELD RTG2_AARELE R*4 FILL=00
+Current Hour Emergency Rating
+
+//FIELD NETSUB_AARELE I*4 FILL=00
+NETMOM record subscript to support any display links required
+
+!-- AAROUT Record AARSMR Partition Details ------------------------------------------------------//
+//FIELD SUBSTN_AAROUT C*8 FILL=00
+Maps to SCADAMOM.ID_SUBSTN
+
+//FIELD DEVTYP_AAROUT C*6 FILL=00
+Maps to SCADAMOM.ID_DEVTYP
+
+//FIELD DEVICE_AAROUT C*14 FILL=00
+Maps to SCADAMOM.ID_DEVICE
+
+//FIELD ANALOG_AAROUT C*4 FILL=00
+Maps to SCADAMOM.ID_ANALOG
+
+//FIELD SCAKEY_AAROUT I*4 FILL=00
+Mapped Analog SCADA Key
+
+//FIELD SCAHDL_AAROUT I*4 FILL=00
+SCAPI Registered Handle for the Analog
+
+//FIELD I__AARELE_AAROUT I*4 FILL=00
+Indirect pointer to map with respective AARELE

@@ -1,0 +1,19 @@
+!------------------------------------------------------------------------------------------------!
+! Description:
+!   AARSYNC Application definition file
+!
+! Design:
+!   Defines AARSYNC Habitat application definition file
+!
+! Revision History: Add the signature whenever changing this file
+!   2024-07-01: Original [Murali Boddeti (or)  mkb]
+!------------------------------------------------------------------------------------------------!
+
+TASK aarsync
+    DESCRIPTION "PSE DNV AAR Sync Application"
+    IMAGE       "aarsync"
+    TARGET DEC_UNIX
+    END_TARGET
+    TARGET WIN_NT
+    END_TARGET
+END_TASK

@@ -1,0 +1,9 @@
+#------------------------------------------------------------------------------------------------#
+# Description:
+#   Describes dbview file for SCADAMOM DB
+#
+# Revision History: Add the signature whenever changing this file
+#   2024-10-01: Original [Murali Boddeti (or)  mkb]
+#------------------------------------------------------------------------------------------------#
+OVERRIDE: cpp=haccess_aarsync_scadamom :class=AarsyncScadamom
+EXDBDEF: enabled=true
