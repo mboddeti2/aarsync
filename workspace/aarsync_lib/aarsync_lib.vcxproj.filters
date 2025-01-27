@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\mlf_aarsync.c" />
+    <ClCompile Include="..\..\aarsync_ruser_entry.cpp">
+      <Filter>Source Code Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\aarsync_ruser_mail.cpp">
+      <Filter>Source Code Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\aarsync_scapi.cpp">
+      <Filter>Source Code Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\aarsync_util.cpp">
+      <Filter>Source Code Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\haccess_aarsync_aarsdb.cpp">
+      <Filter>Source Code Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\haccess_aarsync_netmom.cpp">
+      <Filter>Source Code Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\haccess_aarsync_scadamom.cpp">
+      <Filter>Source Code Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\common_util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\debug_manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\haccess_aarsync_aarsdb.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\haccess_aarsync_netmom.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\haccess_aarsync_scadamom.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\haccess_hdb.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\hdb_util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\README.md" />
+    <None Include="..\..\aarsdb.dbdef">
+      <Filter>Habitat Configuration Files</Filter>
+    </None>
+    <None Include="..\..\aarslg.dbdef">
+      <Filter>Habitat Configuration Files</Filter>
+    </None>
+    <None Include="..\..\aarsync.appdef">
+      <Filter>Habitat Configuration Files</Filter>
+    </None>
+    <None Include="..\..\aarsync.cls">
+      <Filter>Habitat Configuration Files</Filter>
+    </None>
+    <None Include="..\..\aarsync_netmom.dbview">
+      <Filter>Habitat Configuration Files</Filter>
+    </None>
+    <None Include="..\..\aarsync_scadamom.dbview">
+      <Filter>Habitat Configuration Files</Filter>
+    </None>
+    <None Include="..\..\aarsync_build.bat">
+      <Filter>Habitat Configuration Files</Filter>
+    </None>
+    <None Include="..\..\aarsync.message" />
+    <None Include="..\..\aarsync.mk">
+      <Filter>Habitat Configuration Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{bcf628b8-63c4-4cd0-93d7-ff8975aedca5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Code Files">
+      <UniqueIdentifier>{4fd09d59-8456-430c-94ac-e2180ecc2810}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Habitat Configuration Files">
+      <UniqueIdentifier>{7842eebb-70d3-4186-9643-355929a4a5fb}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\CMakeLists.txt">
+      <Filter>Habitat Configuration Files</Filter>
+    </Text>
+  </ItemGroup>
+</Project>

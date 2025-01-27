@@ -12,12 +12,17 @@
 
 // Include Files: System header file
 
-// Include Files: External header file
+// Include Files: Habitat Headers
+#include "ppm.h"
+#include "cfgman.h"
+#include "ruser.h"
 
 // Include Files: Current Program header file
 
 // Class Definitions 
-#define FLOAT_EPSILON 0.00001f
+#define AARSYNC_VERSION "1.0"
+#define AARSYNC_SCAPI_VERIFY 1
+#define AARSYNC_SCAPI_REVERIFY 2
 
 class HaccessAarsdb;
 class AarsyncNetmom;
@@ -39,15 +44,14 @@ protected:
 
 private:
     std::string Task = "AARSYNC";
-    std::string Version = "1.0";
-    std::string SrcApp; // Data Source Applciation name
-    std::string SrcFam; // Data Source Family name
-    std::string GetApp ();
-    std::string GetFam ();
+	std::string Version = AARSYNC_VERSION;
+	std::string App = "";
+	std::string Fam = "";
     std::string GetProcmanFam ();
 
     int CurTime = 0;
     int CurHour = 0;
+	int VerifyType = AARSYNC_SCAPI_VERIFY;
 
     static AARSYNC_MAIN* g_pMain;
 
@@ -89,10 +93,35 @@ private:
 
     void InitParameters ();
     template <typename T1, typename T2> bool SetDefault (T1& iField, int iSub, T2 iValue);
-    void WriteStatus (std::string iStatus);
+    std::string WriteStatus (std::string iStatus);
 
-    // aarsync_import.cpp routines
+    // aarsync_util.cpp routines
+	std::map <std::string, bool> CoInc;
+	std::map <std::string, int> Line;
+	std::map <std::string, int> Ln;
+	std::map <std::string, int> Zbr;
+	std::map <std::string, int> Xf;
+	std::map <std::string, int> Cb;
+	std::map <std::string, int> Aarele;
+	std::map <std::string, int> Analog;
+	void CreateHash ();
+
+	void PopulateNetmomModel();
+	bool IsCoIncluded (std::string iType, std::string iCompId, std::string iCoId);
+	template <typename T> void PopulateModelLn (T& iEleData, int iSub);
+	template <typename T> void PopulateModelZbr(T& iEleData, int iSub);
+	template <typename T> void PopulateModelXf (T& iEleData, int iSub);
+	template <typename T> void PopulateModelCb (T& iEleData, int iSub);
+	void CreateAareleHash ();
+
+	void PopulateScadamomModel();
+
     bool Import (std::string iFileName, bool iForce);
+	bool Export (std::string iFileName);
+	std::time_t UpdateTime = 0;
+	void SetFileOld ();
+	std::string GetEleType (int iSub);
+	void WriteMessage(char iSev, std::string iMsg);
 
     // aarsync_ruser_mail.cpp routines
     static void RuserMailCallbk (const char* iCommand);
@@ -109,8 +138,23 @@ private:
     template <typename T1, typename T2> void CreateIntHash (AARSYNC_INT_HASH& iHash, T1& iRec, T2& iId);
     template <typename T1, typename T2, typename T3> void CreateStringHash (AARSYNC_STRING_HASH& iHash, T1& iRec, T2& iId, T3& iValue);
 
-    AARSYNC_STRING_HASH ProcmanNode;
     AARSYNC_INT_HASH User;
+
+	// aarsync_scapi.cpp routines
+	bool ScapiInitFlag   = false;
+	bool ScapiEnableFlag = false;
+	bool ScapiVerifyFlag = false;
+
+	void ScapiInitialize ();
+	static void ScapiCommCallBk(SCF_STATUS iStatus, void *);
+	void ScapiRegister();
+	static void ScapiVerifyCallBk(SCF_STATUS iStatus, void *iVerifyType);
+	float ReadLimit(int iHandle, int iLimNum);
+	void WriteLimits();
+	void WriteLimit(int iHandle, int iLimNum, float iNewVal, float iCurVal);
+
+	std::map <int, std::string> gScapiErr;
+	static void ScapiWriteCallbk(SCF_STATUS iStatus, void*);
 
 };
 #endif // _AARSYNC_MAIN_H_

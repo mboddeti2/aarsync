@@ -1,6 +1,6 @@
 !------------------------------------------------------------------------------------------------//
 ! Description:
-!   Dbdef file definining all AARSYNC database, partitions, records and field details
+!   Dbdef file definining all AARSYNC LOG database, partitions, records and field details
 !
 ! Revision History:
 !   2024-10-01: Original [Murali Boddeti (or)  mkb]
@@ -8,8 +8,8 @@
 
 //DBDEF AARSLG TITLE=(PSE_AARSYNC)
 
-//RECTYP TEXT(10000) NOPARENT
-//FLAGS=(CIRCULAR)
+//RECTYP MESS(10000) NOPARENT
+// FLAGS=(CIRCULAR)
 AARSYNC Application message log
 
 !------------------------------------------------------------------------------------------------//
@@ -19,20 +19,20 @@ AARSYNC Application message log
 // FLAGS=(REPLICATED)
 Message Partition
 
-//FIELD  TEXT_TEXT C*128 FILL=20
+//FIELD TEXT_MESS C*128 FILL=20
 Holds to log message string
 
-//FIELD  TIME_TEXT T*4  FILL=00
+//FIELD TIME_MESS T*4  FILL=00
 Holds the message time
 
-//FIELD  A$TEXT    C*20 FILL=20
+//FIELD A$MESS C*20 FILL=20
 Misc fields used in MLF interface
 
-//FIELD  B$TEXT    C*20  FILL=20
+//FIELD B$MESS C*20  FILL=20
 Misc fields used in MLF interface
 
-//FIELD  C$TEXT    L*4  FILL=00
+//FIELD C$MESS L*4  FILL=00
 Misc fields used in MLF interface
 
-//FIELD  SEV_TEXT  C*1  FILL=20
+//FIELD SEV_MESS C*1  FILL=20
 SEV	AARSMSG	C*1	Message Severity

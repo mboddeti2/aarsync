@@ -8,11 +8,11 @@
 
 //DBDEF AARSDB TITLE=(PSE_AARSYNC)
 
-//RECTYP AARELE(5000) NOPARENT
+//RECTYP AARELE(10000) NOPARENT
 // FLAGS = (GLOBAL,OID)
 Ambient Adjusted Rating Element (Can associate to NETMOM.LN or NETMOM.ZBR or NETMOM.XF)
 
-//RECTYP AAROUT(10000) NOPARENT
+//RECTYP AAROUT(30000) NOPARENT
 // FLAGS = (GLOBAL,OID)
 Holds auto populated Current Hour MVA points as read by AARSync from SCADAMOM.SCADA.EMS
 
@@ -24,17 +24,35 @@ Holds auto populated Current Hour MVA points as read by AARSync from SCADAMOM.SC
 AARSync Application Parameter Replicated Partition
 
 !-- ITEMS Record AARSPR Partition Details -------------------------------------------------------//
+//FIELD COINC C*128 FILL=80
+NETMOM Companies to Include in AARSYNC seperated by comma
+
 //FIELD DNVFILE C*64 FILL=80
 DNV File name including Path (Can contain environment variables)
 
+//FIELD NETAPP C*8 FILL=80
+Source NETMOM Application Name
+
+//FIELD NETFAM C*8 FILL=80
+Source NETMOM Application Family Name
+
+//FIELD SCAPP C*8 FILL=80
+Source SCADAMOM Application Name
+
+//FIELD SCFAM C*8 FILL=80
+Source SCADAMOM Application Family Name
+
 //FIELD FLOLDTH I*4 FILL=80
-FILEOLD flag is set to true after this many seconds of DNV file not updating. (Default 2 Hours or 2*60*60 seconds)
+When DNV File is older than these many seconds FILEOLD flag is set to true. (Default 2 Hours or 2*60*60 seconds)
+
+//FIELD SPIURTE I*4 FILL=80
+SCAPI Update Set Refresh Time (default = 10 seconds)
 
 //FIELD PERTM I*4 FILL=80
-Periodic timer1 in seconds to check file updates (default = 5*60)
+Periodic timer in seconds to check file updates (default = 5*60)
 
 //FIELD OFFTM I*4 FILL=80
-Timer1 offset in seconds (default = 0)
+Periodic timer offset in seconds (default = 0)
 
 //FIELD DBGLVL I*4 FILL=80
 Debug Manager Message Level (default = 0)
@@ -50,6 +68,9 @@ Bit Container to hold various flags that are parameters and replicated
 //MASK STDOUT
 True when debug messages are disposed to STDOUT
 
+//FIELD STATUS C*128 FILL=80
+Application execution status
+
 !------------------------------------------------------------------------------------------------//
 !-- Partition AARSMR Details --------------------------------------------------------------------//
 !------------------------------------------------------------------------------------------------//
@@ -58,14 +79,20 @@ True when debug messages are disposed to STDOUT
 AARSync Application Monitored Replicated Partition
 
 !-- ITEMS Record AARSMR Partition Details -------------------------------------------------------//
-//FIELD FILEMT T*4 FILL=80
-Last DNV file modified time as seen by AARSync
-
 //FIELD TVALNMD T*4 FILL=80
 NETMOM Validation time as seen by AARSync
 
+//FIELD VFYMOM T*4 FILL=80
+SCADAMOM Validation time as seen by AARSync
+
 //FIELD SCADART T*4 FILL=80
-Last SCADAMOM read time as seen by AARSync
+Last SCADAMOM read time to register with SCAPI
+
+//FIELD FILEMT T*4 FILL=80
+Last DNV file modified time as seen by AARSync
+
+//FIELD FILERT T*4 FILL=80
+Last DNV file read time as seen by AARSync
 
 //FIELD QR B*4 FILL=00
 Bit Container to hold various flags that are monitored and replicated
@@ -75,26 +102,44 @@ True when file is older than the threshold
 True when file reading error occurred
 
 !-- AARELE Record AARSMR Partition Details ------------------------------------------------------//
+//FIELD MRID_AARELE U*16 FILL=00
+// FLAGS=(MRIDKEY)
+Habitat master resource identifier for Ratings facility read from file.
+
 //FIELD ID_AARELE C*14 FILL=80
 AARELE Id matching with NETMOM.ID_LINE or NETMOM.ID_XF or NETMOM.ID_CB
+
+//FIELD COMPID_AARELE C*32 FILL=80
+AARELE Composite Id unique facility ID, constructed by AARSYNC
 
 //FIELD SEGID_AARELE C*4 FILL=80
 Segment ID matching with NETMOM.ID_LN or NETMOM.ID_XFMR or NETMOM.ID_CBTYP
 
-//FIELD QR_AARELE B*4 FILL=00
+//FIELD TYPE_AARELE B*4 FILL=00
 Bit Container to hold flags that are monitored and replicated
-//MASK LN
+//MASK LINE
 True when this AARELE is a Line
+//MASK LN
+True when this AARELE is a Line Segment
 //MASK ZB
 True when this AARELE is a ZBR
 //MASK XF
 True when this AARELE is a Transformer
-//MASK NMAP
-True when this AARELE is mapped to NETMOM
+//MASK CB
+True when this AARELE is a Switch
+
+//FIELD QR_AARELE B*4 FILL=00
+//MASK DNV
+True when ratings exits for this facility in DNV file
 //MASK SMAP
-True when this AARELE is mapped to SCADAMOM
+True when AAROUT exits for this AARELE
+//MASK VALID
+True when NETMOM, SCADAMOM and DNV mapped
 //MASK MAN
 True when Current Hour AAR ratings are manually overwritten
+
+//FIELD COID_AARELE C*6 FILL=00
+Company Id read from NETMOM.RTNET.EMS
 
 //FIELD FRST_AARELE C*8 FILL=00
 Element From Station read from NETMOM.RTNET.EMS
@@ -102,16 +147,47 @@ Element From Station read from NETMOM.RTNET.EMS
 //FIELD TOST_AARELE C*8 FILL=00
 Element To Station read from NETMOM.RTNET.EMS
 
-//FIELD RTG1_AARELE R*4 FILL=00
+//FIELD OPER_AARELE R*4 FILL=00
+Current Hour Operating Limit Rating generally = 0.95 & NORM rating
+
+//FIELD NORM_AARELE R*4 FILL=00
 Current Hour Normal Rating
 
-//FIELD RTG2_AARELE R*4 FILL=00
+//FIELD EMER_AARELE R*4 FILL=00
 Current Hour Emergency Rating
+
+//FIELD FILEOPER_AARELE R*4 FILL=00
+Current Hour Operating Limit as read from File
+
+//FIELD FILENORM_AARELE R*4 FILL=00
+Current Hour Normal Limit as read from File
+
+//FIELD FILEEMER_AARELE R*4 FILL=00
+Current Hour Emergency Limit as read from File
 
 //FIELD NETSUB_AARELE I*4 FILL=00
 NETMOM record subscript to support any display links required
 
+//FIELD I__AAROUT_AARELE I*4 FILL=00
+Indirect pointer to map with respective AAROUT
+
+//FIELD USER_AARELE C*16 FILL=00
+User ID last did the user entry to overwrite ratings
+
+//FIELD SPIMSG_AARELE C*64 FILL=00
+SCAPI Error message if exists
+
 !-- AAROUT Record AARSMR Partition Details ------------------------------------------------------//
+//FIELD MRID_AAROUT U*16 FILL=00
+// FLAGS=(MRIDKEY)
+Habitat master resource identifier for corresponding SCADAMOM.ANALOG
+
+//FIELD COMPID_AAROUT C*40 FILL=00
+Analog composite ID (<Substation> <DeviceType> <DeviceId> <MeasId> <AnalogId>)
+
+//FIELD COID_AAROUT C*6 FILL=00
+Company Id read from CO_SUBSTN.SCADAMOM.SCADA.EMS
+
 //FIELD SUBSTN_AAROUT C*8 FILL=00
 Maps to SCADAMOM.ID_SUBSTN
 
@@ -121,13 +197,19 @@ Maps to SCADAMOM.ID_DEVTYP
 //FIELD DEVICE_AAROUT C*14 FILL=00
 Maps to SCADAMOM.ID_DEVICE
 
+//FIELD MEAS_AAROUT C*4 FILL=00
+Maps to SCADAMOM.ID_ANALOG
+
 //FIELD ANALOG_AAROUT C*4 FILL=00
 Maps to SCADAMOM.ID_ANALOG
 
-//FIELD SCAKEY_AAROUT I*4 FILL=00
-Mapped Analog SCADA Key
+//FIELD SUB_AAROUT I*4 FILL=00
+Mapped SCADAMOM.ANaLOG subscript
 
-//FIELD SCAHDL_AAROUT I*4 FILL=00
+//FIELD KEY_AAROUT I*4 FILL=00
+Mapped SCADAMOM.ANALOG SCADA Key
+
+//FIELD HANDLE_AAROUT I*4 FILL=00
 SCAPI Registered Handle for the Analog
 
 //FIELD I__AARELE_AAROUT I*4 FILL=00

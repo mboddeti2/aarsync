@@ -33,7 +33,7 @@
 #endif
 
 // Include Files: External header file
-#include "mlf_aarslg.h"
+#include "mlf_aarsync.h"
 
 // Include Files: Current program header file
 
@@ -77,7 +77,7 @@ enum DMF_Types { // Debug Manager Function Types
     DMF_UI,       // UI Function
     DMF_I,        // Function for misc. Interface classes
     DMF_IO,       // Input/Output Function
-    DMF_PSSE,     // PSSE file export function
+    DMF_S,        // SCAPI function
     DMF_L = 40,   // Log Function
 
     DMF_Mom = 51,
@@ -170,7 +170,7 @@ public:
         return Print (iLevel, iFunc, lMsg);
     }
 
-    std::map<std::string,boost::shared_ptr <std::ofstream>> LogFilePtr; // Specific log file messsage if needed
+    boost::unordered_map <std::string,boost::shared_ptr<std::ofstream>> LogFilePtr; // Specific log file messsage if needed
     std::ofstream& GetLogFile (std::string iFileName, const int& iLevel, const int& iFunc) {
         auto it = LogFilePtr.find(iFileName);
         if (it != LogFilePtr.end()) return *it->second;
@@ -206,7 +206,6 @@ public:
             lIssued = true; // Dont mark the message as issued here
             GetLogFile(iFileName, iLevel, iFunc) << lMsgPrefix.str() << ": " << lMsg << std::endl;
         }
-
         return true;
     }
     bool PrintUnique (const int& iLevel, const int& iFunc, const char *Fmt, ...) {
@@ -244,11 +243,11 @@ public:
         if (Stdout && iLevel <= DML_I) std::cout << lTimeStr << lMsgStr.str() << ": " << iMsg << std::endl;
 
         lDmFile << lTimeStr << lMsgStr.str() << ": " << iMsg << std::endl;
-
-        if      (iLevel == DML_I) MlfLogAarsyncAa004(iMsg.c_str());
-        else if (iLevel == DML_W) MlfLogAarsyncAa003(iMsg.c_str());
-        else if (iLevel == DML_E) MlfLogAarsyncAa002(iMsg.c_str());
-        else if (iLevel == DML_F) MlfLogAarsyncAa001(iMsg.c_str());
+		
+		if (iLevel == DML_I) MlfLogAarsyncAa004(iMsg.c_str());
+		else if (iLevel == DML_W) MlfLogAarsyncAa003(iMsg.c_str());
+		else if (iLevel == DML_E) MlfLogAarsyncAa002(iMsg.c_str());
+		else if (iLevel == DML_F) MlfLogAarsyncAa001(iMsg.c_str());
 
         CurNumMsgs ++; // Initialize the number of message
 
@@ -389,7 +388,6 @@ private:
         if ( (Function != DMF_All) && (Function != iFunc) ) return false;
         return true;
     }
-
 };
 
 #define DBG_MGR_LOG DBG_MGR_TRACER _token(__FUNCTION__,GetDm())
@@ -415,7 +413,7 @@ struct DBG_MGR_TRACER_TIME {
         StartTime = boost::chrono::high_resolution_clock::now();
     }
     ~DBG_MGR_TRACER_TIME () {
-        float lSec = (boost::chrono::duration_cast <boost::chrono::milliseconds>
+        double lSec = (boost::chrono::duration_cast <boost::chrono::milliseconds>
             (boost::chrono::high_resolution_clock::now() - StartTime).count()) / 1000.0;
         pDm->Print (DML_I, DMF_U, "%s%s::Completed in - %7.2f seconds", GetPrefix(false).c_str(), lFun, lSec);
     }

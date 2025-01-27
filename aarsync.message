@@ -22,7 +22,7 @@ DEFLOG
 MSG  AA001 SEVERITY  FATAL
     ARG  Message  TYPE STRING
 BEGIN
-    LINE "SM001  F: %<Message>s."
+    LINE "AR001  F: %<Message>s."
     DOCUMENTATION
     #EXPLAIN#
     Fatal error occured in AARSYNC task. Resolve error and restart application.

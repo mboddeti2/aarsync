@@ -60,13 +60,15 @@ public:
     }
 
     std::string GetApp () { // Get application name from task context
-        char lApp[APPMGR_APPLICATION_MAXLEN+1];
-        AppmgrGetApplicationName (lApp, sizeof(lApp)); // Get Application
+		static char lApp[APPMGR_APPLICATION_MAXLEN + 1] = {0};
+		if (lApp[0] != '\0') return lApp;
+		AppmgrGetApplicationName(lApp, sizeof(lApp)); // Get Application
         return lApp;
     }
 
     std::string GetFam () { // Get family name from task context
-        char lFam[APPMGR_FAMILY_MAXLEN+1];
+        static char lFam[APPMGR_FAMILY_MAXLEN+1];
+		if (lFam[0] != '\0') return lFam;
         AppmgrGetFamilyName (lFam, sizeof(lFam)); // Get Family name
         return lFam;
     }
@@ -87,7 +89,7 @@ public:
         SCF_STATUS lStatus = HdbOpen (lSessionHdl, iDb.c_str(), &lDbHdl, iApp.c_str(), iFam.c_str());         
         if (lStatus == HDB_W_DUOPEN) return true; // Open already not an error
         else if (!UtilScfBad(lStatus)) return true;
-        lDm.Print (DML_E,DMF_Mom,"Error(%d) Opening(%s_%s_%s), Is Habitat running?", lStatus, iDb.c_str(), iApp.c_str(), iFam.c_str());
+        lDm.Print (DML_W,DMF_Mom,"Error(%d) Opening(%s_%s_%s), Is Habitat running?", lStatus, iDb.c_str(), iApp.c_str(), iFam.c_str());
         return false;
     }
 
@@ -112,44 +114,6 @@ public:
         UtilScfBad (TimedateSetDefaultClock(lUtcClockHdl, &lCurClockHdl));
         TIMEDATE_HABTIME lHabTime = GetHabTime (iTimeStr);
         UtilScfBad (TimedateSetDefaultClock(lCurClockHdl, &lUtcClockHdl));
-        return lHabTime;
-    }
-    TIMEDATE_HABTIME GetTodTime () {
-        TIMEDATE_HABDATE lHabDate;
-        TIMEDATE_HABTIME lHabTime = GetHabTime();
-        lHabDate = HabtimeToHabdate(lHabTime);
-        lHabTime = HabdateToHabtime(lHabDate);
-        return lHabTime;
-    }
-    TIMEDATE_HABTIME GetTodTimeDaysAgo (const int iDaysAgo) {
-        TIMEDATE_HABDATE lHabDate;
-        TIMEDATE_HABTIME lHabTime = GetHabTime();
-        lHabDate = HabtimeToHabdate(lHabTime);
-        lHabTime = HabdateToHabtime(lHabDate - iDaysAgo);
-        return lHabTime;
-    }
-    TIMEDATE_HABDATE HabtimeToHabdate(const TIMEDATE_HABTIME Habtime_I) {
-        TIMEDATE_HABDATE lHabDate;
-        TIMEDATE_GFORM_HANDLE gForm;
-        gForm = TimedateAllocGform();
-        UtilScfBad (TimedateCvtHabtimeToGform(Habtime_I, gForm));
-        UtilScfBad (TimedateCvtGformToHabdate(gForm, &lHabDate));
-        TimedateDeallocGform(gForm);
-        return lHabDate;
-    }
-    TIMEDATE_HABTIME HabdateToHabtime(const TIMEDATE_HABDATE Habdate_I) {
-        TIMEDATE_HABTIME lHabTime;
-        TIMEDATE_GFORM_HANDLE gForm;
-        gForm = TimedateAllocGform();
-        TIMEDATE_HABDATE habDate = Habdate_I;
-        TIMEDATE_CLOCK_ATTRSET ClockAttrset;
-        //Obtain the current time offset value
-        UtilScfBad (TimedateGetClockAttributes(TIMEDATE_DEFAULT_CLOCK_HANDLE, &ClockAttrset));
-        if( (habDate < 2) && (ClockAttrset.utc_offset > 0) )
-            habDate = 2;
-        UtilScfBad (TimedateCvtHabdateToGform(habDate, gForm));
-        UtilScfBad (TimedateCvtGformToHabtime(gForm, &lHabTime));
-        TimedateDeallocGform(gForm);
         return lHabTime;
     }
     int GetHabHour(const TIMEDATE_HABTIME iHabtime) {
@@ -194,6 +158,22 @@ public:
         return lTimeStr;
     }
 
+	std::string GetGMTTime (std::string iFmtStr) { DBG_MGR_LOG;
+        // Get the GMT time string in the format provided as input by manupulating the default clock
+	    
+	    TIMEDATE_CLOCK_HANDLE lGMTHdl;
+		if (UtilScfBad(TimedateGetClockHandle("UTC", &lGMTHdl))) return "";
+
+		TIMEDATE_CLOCK_HANDLE lPrevHdl;
+		if (UtilScfBad(TimedateSetDefaultClock(lGMTHdl, &lPrevHdl))) return "";
+
+		std::string lGMTTime = GetHdbTimeStr(GetHabTime(), iFmtStr);
+
+		if (UtilScfBad(TimedateSetDefaultClock(lPrevHdl, &lPrevHdl))) return ""; // Set the previous clock again so other operations could go as normal
+		
+		return lGMTTime;
+	}
+
 protected:
 
 private:
@@ -203,13 +183,5 @@ private:
     }
 
 };
-
-/*
-template <typename T> std::string HdbId (T iId) {
-    if (iId.IsEmptyAfterTrim()) return "";
-    if (iId.TestNull()) return "";
-    return iId.c_str_trim_trail_blanks();
-}
-*/
 
 #endif // _HDB_UTIL_H_

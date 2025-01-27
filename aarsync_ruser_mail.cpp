@@ -29,8 +29,8 @@ void AARSYNC_MAIN::RuserMailCallbk (const char* iCommand) { // Static function
     auto& lAarsdbHdb = lMain.GetAarsdbHdb ();
     auto& lAarsdb = lMain.GetAarsdb ();
 
-    COMMON_UTIL lUtil(lDm);
-    HDB_UTIL lHdbUtil(lDm);
+    auto& lUtil = COMMON_UTIL(lDm);
+    auto& lHdbUtil = HDB_UTIL(lDm);
 
     RUSER_CONTEXT lContext = {0};
     RUSER_RECORD  lRecord = {0};
@@ -62,15 +62,36 @@ void AARSYNC_MAIN::RuserMailCallbk (const char* iCommand) { // Static function
 
     int lDbgLvl = DML_I;
     lReply = std::string(iCommand) + " - Completed";
+
     if (boost::iequals(lCommand, "IMPORT")) {
         std::string lFileName = HdbId(lAarsdb.DNVFILE_ITEMS[1]);
         if (lCols.size() > 1) lFileName = lCols[1];
-        if (!lMain.Import(lFileName, true)) lReply = "Import Failed";
+		if (lMain.Import(lFileName, true)) lWrite = true;
+		else lReply = "Import Failed";
     }
+
+	else if (boost::iequals(lCommand, "EXPORT")) {
+		std::string lFileName = "";
+		if (lCols.size() > 1) lFileName = lCols[1];
+		if (!lMain.Export(lFileName)) lReply = "Export Failed";
+	}
+
+	else if (boost::iequals(lCommand, "RESETMAN")) {
+		for (int lSub = 1; lSub <= lAarsdb.AARELE.GetLv(); lSub++) {
+			lAarsdb.OPER_AARELE[lSub] = lAarsdb.FILEOPER_AARELE[lSub];
+			lAarsdb.NORM_AARELE[lSub] = lAarsdb.FILENORM_AARELE[lSub];
+			lAarsdb.EMER_AARELE[lSub] = lAarsdb.FILEEMER_AARELE[lSub];
+
+			lAarsdb.USER_AARELE[lSub].CopyFromSz(""); // Since file ratings are copied from file mark user as empty
+			lAarsdb.MAN_AARELE.Reset(lSub);
+		}
+		lWrite = true;
+	}
 
     else {
         lDbgLvl = DML_E;
         lReply = "Unknown Mail Command - " + lCommand;
+
     }
 
     if (lWrite) {
@@ -80,5 +101,7 @@ void AARSYNC_MAIN::RuserMailCallbk (const char* iCommand) { // Static function
     if (!lReply.empty()) {
         lDm.Print(lDbgLvl, DMF_M, "%s::Reply Message (%s) to console(%s) viewport(%s)", __FUNCTION__, lReply.c_str(), lContext.console, lContext.viewport);
         lHdbUtil.UtilScfBad(RuserSendMessage(lContext.console, lContext.viewport, lReply.c_str(), true, true));
+		lMain.WriteStatus(lReply);
     }
+	else lMain.WriteStatus(lCommand + " Successful");
 }

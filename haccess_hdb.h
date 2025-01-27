@@ -325,7 +325,7 @@ public:
         lDm.Print (DML_5,DMF_Mom, "%s:Writing Field(%s), Rec(%s) Buf(%s) Sub(%d)",
             __FUNCTION__, lField.c_str(), iRec.c_str(), iBuf.c_str(), iSub);
 
-        COMMON_UTIL lUtil(lDm);
+        auto& lUtil = COMMON_UTIL(lDm);
 
         void *lBuf = NULL;
         int   lInt = 0;
@@ -410,7 +410,7 @@ public:
     }
     std::string GetCompFieldValue(const std::string& iField, std::string& iRec, int iSub) { DBG_MGR_LOG;
         DBG_MGR& lDm = GetDm();
-        COMMON_UTIL lUtil(lDm);
+        auto& lUtil = COMMON_UTIL(lDm);
 
         std::vector <std::string> lFieldCols;
         boost::split(lFieldCols, iField, boost::is_any_of(" "));
@@ -449,8 +449,8 @@ public:
 
     std::string GetFieldValue(const std::string& iField, std::string& iRec, int iSub) { DBG_MGR_LOG;
         DBG_MGR& lDm = GetDm();
-        COMMON_UTIL lUtil(lDm);
-        HDB_UTIL lHdbUtil(lDm);
+        auto& lUtil = COMMON_UTIL(lDm);
+        auto& lHdbUtil = HDB_UTIL(lDm);
 
 //        lDm.Print (DML_I,DMF_Mom, "%s:Field(%s), Rec(%s) Sub(%d)", __FUNCTION__, iField.c_str(), iRec.c_str(), iSub);
 
@@ -614,8 +614,8 @@ public:
 
     bool SetFieldValue(const std::string& iField, std::string& iRec, int iSub, void *iBuf) { DBG_MGR_LOG;
         DBG_MGR& lDm = GetDm();
-        COMMON_UTIL lUtil(lDm);
-        HDB_UTIL lHdbUtil(lDm);
+        auto& lUtil = COMMON_UTIL(lDm);
+        auto& lHdbUtil = HDB_UTIL(lDm);
 
         bool lRetVal = true;
 
@@ -858,5 +858,17 @@ template <typename T> std::string HdbId (T iId) {
     if (iId.TestNull()) return "";
     return iId.c_str_trim_trail_blanks();
 }
+
+template <typename T> std::string GetMrid(T iMrid) {
+	char str[37] = {};
+	sprintf(iMrid,
+		"%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x",
+		uuid[0], uuid[1], uuid[2], uuid[3], uuid[4], uuid[5], uuid[6], uuid[7],
+		uuid[8], uuid[9], uuid[10], uuid[11], uuid[12], uuid[13], uuid[14], uuid[15]
+		);
+	return iId.c_str_trim_trail_blanks();
+}
+
+
 
 #endif // _HACCESS_HDB_H_
